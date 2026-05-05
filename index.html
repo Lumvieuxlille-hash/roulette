@@ -3,351 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUM - Pilotage Coffee Shop</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Jeu LÜM - Vieux-Lille</title>
     <style>
+        /* --- COULEURS LÜM --- */
         :root {
-            --bg-color: #faf1e6;
-            --text-color: #954825;
-            --border-color: #dcbfa6;
-            --accent-color: #7a3a1d;
-            --card-bg: #fffbf7;
-            --danger: #c62828;
-            --success: #2e7d32;
+            --primary: #954825; 
+            --primary-light: #b05c35;
+            --bg-color: #faf1e6; 
+            --accent: #76371b; 
+            --success: #27ae60; 
+            --disabled: #eaddcc;
         }
 
         body {
-            font-family: 'Segoe UI', serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0; padding: 20px;
-            line-height: 1.6;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, var(--bg-color) 100%);
+            color: var(--primary);
+            text-align: center;
+            margin: 0;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        /* --- HEADER & LOGO --- */
-        header {
-            display: flex; align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px; padding-bottom: 20px;
-            border-bottom: 2px solid var(--border-color);
-        }
-        .logo-box { display: flex; align-items: center; gap: 20px; }
-        .logo-img {
-            width: 100px; height: 100px;
-            object-fit: contain;
-            border-radius: 8px;
-        }
+        .logo-container img { width: 140px; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(149, 72, 37, 0.1); }
+        
+        .header-title { font-size: 2.2em; font-weight: 900; letter-spacing: -0.5px; margin: 0 0 5px 0; color: var(--primary); }
+        .subtitle { font-size: 1.05em; color: #8a5a44; margin-bottom: 30px; font-weight: 500;}
 
-        /* --- NAVIGATION --- */
-        .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
-        .tab-btn {
-            background: none; border: 2px solid var(--text-color);
-            color: var(--text-color); padding: 12px 25px;
-            cursor: pointer; font-weight: bold; border-radius: 5px;
-            transition: 0.3s;
-        }
-        .tab-btn.active, .tab-btn:hover {
-            background: var(--text-color); color: var(--bg-color);
-        }
-
-        /* --- DASHBOARD --- */
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .kpi-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px; margin-bottom: 30px;
-        }
-        .kpi-card {
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            padding: 20px; border-radius: 12px; text-align: center;
-            box-shadow: 0 4px 15px rgba(149, 72, 37, 0.05);
-        }
-        .kpi-card h3 { margin: 0 0 10px; font-size: 0.9em; text-transform: uppercase; opacity: 0.7; }
-        .kpi-val { font-size: 1.8em; font-weight: bold; }
-        .status-warn { color: orange; font-weight: bold; font-size: 0.8em; }
-
-        .main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
-
-        /* --- FORMULAIRE --- */
-        .box {
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            padding: 25px; border-radius: 12px;
-        }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; }
-        input, select, textarea {
-            width: 100%; padding: 10px; border: 1px solid var(--border-color);
-            border-radius: 6px; background: var(--bg-color); color: var(--accent-color);
+        /* --- CARTES ET ETAPES --- */
+        .card {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(149, 72, 37, 0.08);
+            max-width: 420px;
+            width: 100%;
+            margin-bottom: 25px;
             box-sizing: border-box;
+            transition: all 0.5s ease;
         }
-        .btn-add {
-            background: var(--text-color); color: white; border: none;
-            padding: 15px; width: 100%; border-radius: 6px;
-            font-weight: bold; cursor: pointer; font-size: 1em;
-        }
-        .btn-add:hover { background: var(--accent-color); }
 
-        /* --- TABLEAU --- */
-        .reg-tools { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
-        .btn-export { background: #5d4037; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--bg-color); }
-        th { background: var(--text-color); color: white; }
-        .row-in { color: var(--success); font-weight: bold; }
-        .btn-del { color: var(--danger); border: 1px solid var(--danger); background: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
-        .btn-del:hover { background: var(--danger); color: white; }
+        .step-badge {
+            background-color: var(--primary-light);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        /* Mode Grisé pour l'étape 2 */
+        .locked {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(60%);
+            transform: scale(0.98);
+        }
+
+        /* --- BOUTONS --- */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            font-size: 1.05em;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(149, 72, 37, 0.2);
+        }
+        .btn:hover { background-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(149, 72, 37, 0.3); }
+        .btn:disabled { background-color: var(--disabled); color: #9a8c81; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        .btn-google { background-color: white; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-google:hover { background-color: var(--primary); color: white; }
+
+        /* --- FORMULAIRES ET BLUFF --- */
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            text-align: left;
+            font-size: 0.95em;
+            margin: 20px 0;
+            gap: 12px;
+            color: #555;
+            padding: 15px;
+            background-color: var(--bg-color);
+            border-radius: 12px;
+        }
+        .checkbox-container input { margin-top: 3px; transform: scale(1.3); accent-color: var(--primary); }
+
+        #verify-section, #loading-section, #step3, #already-played { display: none; }
+
+        .progress-container { width: 100%; background-color: var(--disabled); border-radius: 15px; margin: 20px 0; height: 12px; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; background-color: var(--primary); border-radius: 15px; transition: width 0.4s ease, background-color 0.4s ease; }
+        #loading-text { font-size: 0.9em; font-weight: bold; color: var(--accent); margin-top: -5px;}
+
+        /* --- ROULETTE PREMIUM --- */
+        .wheel-container { position: relative; width: 280px; height: 280px; margin: 20px auto 30px; }
+        canvas {
+            width: 100%; height: 100%; border-radius: 50%;
+            box-shadow: 0 10px 25px rgba(149, 72, 37, 0.2);
+            transition: transform 5s cubic-bezier(0.1, 0.9, 0.1, 1); /* Animation ultra fluide */
+            border: 5px solid white;
+        }
+        /* L'axe central de la roue */
+        .wheel-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; background: white; border-radius: 50%; z-index: 5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2); border: 3px solid var(--primary);
+        }
+        .pointer {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent;
+            border-top: 35px solid var(--primary); z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.15));
+        }
+
+        /* --- RESULTAT --- */
+        #qr-container img { border-radius: 15px; padding: 12px; background: white; border: 2px solid var(--disabled); margin-top:15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);}
+        .ticket-code { font-weight: 900; font-size: 1.6em; color: var(--primary); letter-spacing: 3px; margin: 15px 0;}
+        .conditions { font-size: 0.85em; font-style: italic; color: #8a5a44; margin-top: 15px; padding: 10px; background: var(--bg-color); border-radius: 10px; }
+
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo-box">
-        <img src="LOGO LUM.png" alt="LUM Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/100?text=LUM'">
-        <div>
-            <h1 style="color: var(--text-color); margin:0;">Pilotage Financier</h1>
-            <small>LUM Coffee Shop</small>
-        </div>
-    </div>
-</header>
-
-<div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('dash')">Tableau de Bord</button>
-    <button class="tab-btn" onclick="switchTab('reg')">Registre & Export</button>
-</div>
-
-<div id="dash" class="tab-content active">
-    <div class="kpi-grid">
-        <div class="kpi-card"><h3>Chiffre d'Affaires</h3><div class="kpi-val" id="kpi-ca">0.00 €</div></div>
-        <div class="kpi-card"><h3>Résultat Net</h3><div class="kpi-val" id="kpi-net">0.00 €</div></div>
-        <div class="kpi-card">
-            <h3>Ratio Matière</h3>
-            <div class="kpi-val" id="kpi-ratio">0%</div>
-            <div id="ratio-alert" class="status-warn"></div>
-        </div>
-        <div class="kpi-card"><h3>Panier Moyen</h3><div class="kpi-val" id="kpi-basket">0.00 €</div></div>
+    <div class="logo-container">
+        <!-- N'oubliez pas de mettre le lien de votre image hébergée ici -->
+        <img src="LOGO LUM.png" alt="Logo LÜM">
     </div>
 
-    <div class="main-layout">
-        <div class="box">
-            <h2>Nouvelle Transaction</h2>
-            <form id="tx-form">
-                <div class="form-row">
-                    <div><label>Date</label><input type="date" id="f-date" required></div>
-                    <div><label>Type</label>
-                        <select id="f-type" onchange="toggleInputs()">
-                            <option value="Dépense">Dépense</option>
-                            <option value="Entrée">Entrée d'argent</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div><label>Catégorie</label><select id="f-cat"></select></div>
-                    <div><label>TVA (%)</label>
-                        <select id="f-tva">
-                            <option value="5.5">5.5% (Alim. emporté)</option>
-                            <option value="10">10% (Alim. sur place)</option>
-                            <option value="20">20% (Matériel/Alcool)</option>
-                            <option value="0">0% (Franchise/Salaires)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row" id="row-tickets" style="display:none;">
-                    <div style="grid-column: span 2;">
-                        <label>Nombre de clients (Tickets)</label>
-                        <input type="number" id="f-tickets" placeholder="Ex: 45">
-                    </div>
-                </div>
-                <div class="form-group" style="margin-bottom:15px;">
-                    <label>Libellé court</label>
-                    <input type="text" id="f-lab" placeholder="Ex: Grossiste Lait" required>
-                </div>
-                <div class="form-group" style="margin-bottom:15px;">
-                    <label>Désignation détaillée</label>
-                    <textarea id="f-desc" rows="2" placeholder="Ex: 4 cartons Oatly + 2 cartons amande"></textarea>
-                </div>
-                <div class="form-group" style="margin-bottom:20px;">
-                    <label>Montant TTC (€)</label>
-                    <input type="number" step="0.01" id="f-amt" required>
-                </div>
-                <button type="submit" class="btn-add">Enregistrer</button>
-            </form>
-        </div>
-        <div class="box">
-            <h2>Répartition des Coûts</h2>
-            <canvas id="chart"></canvas>
-        </div>
+    <!-- MESSAGE SI DEJA JOUE -->
+    <div id="already-played" class="card">
+        <h1 class="header-title">Oups ! 🫣</h1>
+        <p>Il semblerait que vous ayez déjà fait tourner la roue magique.</p>
+        <p style="font-weight: bold; color: var(--accent);">On laisse un peu de chance aux autres ! (Limité à 1 cadeau par personne).</p>
+        <p>Merci pour votre fidélité et à très vite chez LÜM ! ☕</p>
     </div>
-</div>
 
-<div id="reg" class="tab-content">
-    <div class="box">
-        <div class="reg-tools">
-            <div style="display:flex; gap:10px;">
-                <div><label>Début</label><input type="date" id="filter-s"></div>
-                <div><label>Fin</label><input type="date" id="filter-e"></div>
-                <button class="btn-export" onclick="applyFilters()" style="background:var(--text-color)">Filtrer</button>
+    <!-- ÉTAPE 1 : Avis -->
+    <div id="step1" class="card">
+        <div class="step-badge">Étape 1</div>
+        <h2 style="margin-top:0;">Votre avis compte !</h2>
+        <p class="subtitle">Soutenez votre coffee shop adoré avec un petit mot doux sur Google.</p>
+        
+        <button class="btn btn-google" id="btn-go-google" onclick="openGoogle()">Laisser un avis Google ⭐</button>
+        
+        <div id="verify-section">
+            <div class="checkbox-container">
+                <input type="checkbox" id="certify-checkbox" onchange="toggleVerifyButton()">
+                <label for="certify-checkbox"><strong>C'est fait !</strong> Je certifie sur l'honneur avoir publié mon avis pour LÜM.</label>
             </div>
-            <button class="btn-export" onclick="exportCSV()">⬇️ Export Excel (CSV)</button>
+            <button class="btn" id="verify-btn" onclick="startFakeVerification()" disabled>Débloquer la roue 🔓</button>
         </div>
-        <table id="reg-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Catégorie</th>
-                    <th>Désignation</th>
-                    <th>TVA</th>
-                    <th>Montant TTC</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="reg-body"></tbody>
-        </table>
+
+        <div id="loading-section">
+            <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+            <p id="loading-text">Initialisation...</p>
+        </div>
     </div>
-</div>
 
-<script>
-    // --- GESTION DES DONNÉES (LocalStorage) ---
-    let db = JSON.parse(localStorage.getItem('lum_data')) || [];
-    let chartObj = null;
-
-    function save() {
-        localStorage.setItem('lum_data', JSON.stringify(db));
-        render();
-    }
-
-    // --- LOGIQUE FORMULAIRE ---
-    function toggleInputs() {
-        const type = document.getElementById('f-type').value;
-        const catS = document.getElementById('f-cat');
-        const ticketsRow = document.getElementById('row-tickets');
-        catS.innerHTML = '';
+    <!-- ÉTAPE 2 : La Roulette (Grisée au début) -->
+    <div id="step2" class="card locked">
+        <div class="step-badge">Étape 2</div>
+        <h2 style="margin-top:0;">Tournez pour gagner !</h2>
+        <p class="subtitle" style="font-size:0.9em; margin-bottom: 15px;">Le hasard fait bien les choses (surtout chez nous).</p>
         
-        if (type === 'Dépense') {
-            ['Stock', 'Structure', 'RH', 'Investissement'].forEach(c => catS.add(new Option(c, c)));
-            ticketsRow.style.display = 'none';
-        } else {
-            ['Ventes', 'Apport'].forEach(c => catS.add(new Option(c, c)));
-            ticketsRow.style.display = 'block';
-        }
-    }
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel-center"></div>
+            <canvas id="wheel" width="400" height="400"></canvas>
+        </div>
+        <button id="spinBtn" class="btn" onclick="spin()">Lancer la roue 🎡</button>
+    </div>
 
-    document.getElementById('tx-form').onsubmit = (e) => {
-        e.preventDefault();
-        const tx = {
-            id: Date.now(),
-            date: document.getElementById('f-date').value,
-            type: document.getElementById('f-type').value,
-            cat: document.getElementById('f-cat').value,
-            tva: document.getElementById('f-tva').value,
-            lab: document.getElementById('f-lab').value,
-            desc: document.getElementById('f-desc').value,
-            amt: parseFloat(document.getElementById('f-amt').value),
-            tickets: parseInt(document.getElementById('f-tickets').value) || 0
+    <!-- ÉTAPE 3 : Le Résultat -->
+    <div id="step3" class="card">
+        <h1 class="header-title" id="result-title">🎉 BINGO ! 🎉</h1>
+        <p id="result-desc" style="font-size: 1.2em; font-weight: bold; color: var(--accent);"></p>
+        
+        <div id="qr-container"></div>
+        <p id="ticket-text" class="ticket-code"></p>
+        
+        <p>Présentez ce code (et votre plus beau sourire) au barista pour récupérer votre gain !</p>
+        <p id="conditions-text" class="conditions"></p>
+    </div>
+
+    <script>
+        // --- VERIFICATION ANTI-TRICHE ---
+        window.onload = function() {
+            if (localStorage.getItem("lum_roulette_played") === "true") {
+                document.getElementById("step1").style.display = "none";
+                document.getElementById("step2").style.display = "none";
+                document.getElementById("already-played").style.display = "block";
+            } else {
+                drawWheel();
+            }
         };
-        db.push(tx);
-        e.target.reset();
-        document.getElementById('f-date').valueAsDate = new Date();
-        toggleInputs();
-        save();
-    };
 
-    // --- CALCULS & RENDU ---
-    function render(data = db) {
-        let ca = 0, dep = 0, stock = 0, tickets = 0;
-        const tbody = document.getElementById('reg-body');
-        tbody.innerHTML = '';
+        // --- GESTION DE L'ÉTAPE 1 ---
+        function openGoogle() {
+            window.open("https://g.page/r/CSNA3VjlrWkTEBM/review", "_blank");
+            setTimeout(() => {
+                document.getElementById("verify-section").style.display = "block";
+                document.getElementById("btn-go-google").innerText = "Modifier mon avis Google";
+                document.getElementById("btn-go-google").style.backgroundColor = "var(--bg-color)";
+                document.getElementById("btn-go-google").style.border = "none";
+            }, 2500); 
+        }
 
-        data.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
-            if (t.type === 'Entrée') { ca += t.amt; tickets += t.tickets; }
-            else { dep += t.amt; if(t.cat === 'Stock') stock += t.amt; }
+        function toggleVerifyButton() {
+            document.getElementById("verify-btn").disabled = !document.getElementById("certify-checkbox").checked;
+        }
 
-            const tr = document.createElement('tr');
-            if(t.type === 'Entrée') tr.className = 'row-in';
-            tr.innerHTML = `
-                <td>${t.date}</td>
-                <td>${t.type}</td>
-                <td>${t.cat}</td>
-                <td><strong>${t.lab}</strong><br><small>${t.desc}</small></td>
-                <td>${t.tva}%</td>
-                <td>${t.amt.toFixed(2)} €</td>
-                <td><button class="btn-del" onclick="del(${t.id})">✕</button></td>
-            `;
-            tbody.appendChild(tr);
-        });
+        // --- LA SÉQUENCE DE BLUFF ET DEVERROUILLAGE ---
+        function startFakeVerification() {
+            document.getElementById("verify-section").style.display = "none";
+            document.getElementById("btn-go-google").style.display = "none";
+            document.getElementById("loading-section").style.display = "block";
 
-        // Update KPIs
-        document.getElementById('kpi-ca').innerText = ca.toFixed(2) + " €";
-        document.getElementById('kpi-net').innerText = (ca - dep).toFixed(2) + " €";
-        document.getElementById('kpi-net').style.color = (ca - dep) >= 0 ? 'var(--success)' : 'var(--danger)';
-        
-        const ratio = ca > 0 ? (stock / ca * 100) : 0;
-        document.getElementById('kpi-ratio').innerText = ratio.toFixed(1) + "%";
-        document.getElementById('ratio-alert').innerText = ratio > 30 ? "⚠️ Coût trop élevé (>30%)" : "";
+            const progressBar = document.getElementById("progress-bar");
+            const loadingText = document.getElementById("loading-text");
 
-        const basket = tickets > 0 ? (ca / tickets) : 0;
-        document.getElementById('kpi-basket').innerText = basket.toFixed(2) + " €";
+            setTimeout(() => { progressBar.style.width = "40%"; loadingText.innerText = "Recherche de l'avis..."; }, 500);
+            setTimeout(() => { progressBar.style.width = "85%"; loadingText.innerText = "Analyse terminée..."; }, 2000);
+            setTimeout(() => { 
+                progressBar.style.width = "100%"; 
+                progressBar.style.backgroundColor = "var(--success)"; 
+                loadingText.innerText = "✓ Accès autorisé !"; 
+                loadingText.style.color = "var(--success)"; 
+            }, 3500);
 
-        updateChart();
-    }
+            setTimeout(() => {
+                // On cache l'étape 1
+                document.getElementById("step1").style.display = "none";
+                // On DÉGRISE l'étape 2 (on retire la classe "locked")
+                const step2 = document.getElementById("step2");
+                step2.classList.remove("locked");
+                // On scroll doucement vers la roue
+                step2.scrollIntoView({ behavior: 'smooth' });
+            }, 4500); 
+        }
 
-    function del(id) { if(confirm("Supprimer ?")) { db = db.filter(t => t.id !== id); save(); } }
+        // --- LOTS PUNCHY (100% GAGNANT) ---
+        // J'ai mis des noms funs et ajouté des emojis au texte affiché sur la roue
+        const segments = [
+            { label: "Gobelet Collector LÜM ✨", short: "Gobelet LÜM ✨", color: "#954825", proba: 5 },       
+            { label: "Shot de Survie (Espresso) ⚡", short: "Espresso ⚡", color: "#af5830", proba: 10 },          
+            { label: "Péché Mignon (Dessert) 🍰", short: "Dessert 🍰", color: "#7a3a1d", proba: 5 },  
+            { label: "Magnet Pimpant LÜM 🧲", short: "Magnet 🧲", color: "#c46a3f", proba: 5 },         
+            { label: "Câlin Magique du Barista 🤗", short: "Câlin Barista 🤗", color: "#5c2a14", proba: 5 },   
+            { label: "Petite Douceur Surprise 🍪", short: "Douceur 🍪", color: "#eaddcc", proba: 70 }  
+        ];
 
-    function switchTab(id) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.target.classList.add('active');
-    }
+        // --- DESSIN DE LA ROUE ---
+        const canvas = document.getElementById("wheel");
+        const ctx = canvas.getContext("2d");
+        const numSegments = segments.length;
+        const arc = (2 * Math.PI) / numSegments;
+        let currentRotation = 0;
 
-    // --- EXPORT CSV ---
-    function exportCSV() {
-        let csv = "Date;Type;Categorie;Libelle;Description;TVA;Montant TTC\n";
-        db.forEach(t => {
-            csv += `${t.date};${t.type};${t.cat};${t.lab};${t.desc.replace(/;/g,',')};${t.tva};${t.amt}\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "comptabilite_LUM.csv";
-        link.click();
-    }
+        function drawWheel() {
+            for (let i = 0; i < numSegments; i++) {
+                const angle = currentRotation + i * arc;
+                ctx.beginPath();
+                ctx.fillStyle = segments[i].color;
+                ctx.moveTo(200, 200);
+                ctx.arc(200, 200, 200, angle, angle + arc, false);
+                ctx.lineTo(200, 200);
+                ctx.fill();
+                
+                ctx.save();
+                ctx.fillStyle = i === 5 ? "#954825" : "#ffffff"; // Texte marron sur fond beige clair, blanc sur le reste
+                ctx.translate(200 + Math.cos(angle + arc / 2) * 140, 200 + Math.sin(angle + arc / 2) * 140);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
+                ctx.font = "bold 17px Helvetica, Arial";
+                // On utilise le nom court ("short") pour que ça rentre bien dans les parts de la roue
+                ctx.fillText(segments[i].short, 45, 6);
+                ctx.restore();
+            }
+        }
 
-    function applyFilters() {
-        const s = document.getElementById('filter-s').value;
-        const e = document.getElementById('filter-e').value;
-        let filtered = db;
-        if(s) filtered = filtered.filter(t => t.date >= s);
-        if(e) filtered = filtered.filter(t => t.date <= e);
-        render(filtered);
-    }
+        // --- MECANIQUE DE LA ROULETTE ---
+        function spin() {
+            document.getElementById("spinBtn").disabled = true;
+            document.getElementById("spinBtn").innerText = "Ça tourne... 🤞";
 
-    function updateChart() {
-        const ctx = document.getElementById('chart').getContext('2d');
-        const cats = {};
-        db.filter(t => t.type === 'Dépense').forEach(t => cats[t.cat] = (cats[t.cat] || 0) + t.amt);
-        
-        if(chartObj) chartObj.destroy();
-        chartObj = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(cats),
-                datasets: [{
-                    data: Object.values(cats),
-                    backgroundColor: ['#954825', '#b56d4b', '#dcbfa6', '#7a3a1d'],
-                    borderWidth: 0
-                }]
-            },
-            options: { plugins: { legend: { position: 'bottom' } } }
-        });
-    }
+            localStorage.setItem("lum_roulette_played", "true");
 
-    document.getElementById('f-date').valueAsDate = new Date();
-    toggleInputs();
-    render();
-</script>
+            let rand = Math.random() * 100;
+            let sum = 0;
+            let winningIndex = 0;
+            
+            for (let i = 0; i < segments.length; i++) {
+                sum += segments[i].proba;
+                if (rand <= sum) { winningIndex = i; break; }
+            }
 
+            const segmentDegrees = 360 / numSegments;
+            const extraSpins = 360 * 7; // Un tour de plus pour le suspense
+            const stopAngle = extraSpins + (360 - (winningIndex * segmentDegrees)) - (segmentDegrees / 2) - 90;
+
+            canvas.style.transform = `rotate(${stopAngle}deg)`;
+
+            setTimeout(() => {
+                showResult(winningIndex);
+            }, 5500); // Animation plus longue
+        }
+
+        // --- RESULTAT ---
+        function showResult(index) {
+            document.getElementById("step2").style.display = "none";
+            document.getElementById("step3").style.display = "block";
+            document.getElementById("step3").scrollIntoView({ behavior: 'smooth' });
+
+            const resultDesc = document.getElementById("result-desc");
+            const qrContainer = document.getElementById("qr-container");
+            const ticketText = document.getElementById("ticket-text");
+            const conditionsText = document.getElementById("conditions-text");
+
+            // On affiche le nom complet (punchy) du cadeau
+            resultDesc.innerText = `Vous avez remporté : \n${segments[index].label}`;
+            
+            const randomCode = "LUM-" + Math.random().toString(36).substr(2, 4).toUpperCase();
+            ticketText.innerText = randomCode;
+
+            // QR Code stylisé
+            qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=954825&data=${randomCode}-${segments[index].short.replace(/ /g, '_')}" alt="QR Code">`;
+
+            if (index === 4 || index === 3 || index === 5) { 
+                conditionsText.innerHTML = "💡 <strong>Comment ça marche ?</strong><br>Valable immédiatement au comptoir ! Limité à 1 cadeau par personne.";
+            } else { 
+                conditionsText.innerHTML = "💡 <strong>Comment ça marche ?</strong><br>Valable sur votre <strong>PROCHAINE</strong> commande (min 5€). Conservez bien ce code !";
+            }
+        }
+    </script>
 </body>
 </html>
